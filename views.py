@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from .forms import *
 
 # Create your views here.
 def myfunctioncall(request):
@@ -68,3 +69,35 @@ def myimagepage5(request, imagename):
 
 def myform(request):
     return render(request, 'myform.html')
+
+def submitmyform(request):
+    mydictionary = {
+        "var1" : request.POST['mytext'],
+        "var2" : request.POST['mytextarea'],
+        "method" : request.method
+    }
+    return JsonResponse(mydictionary)
+
+def myform2(request):
+    if request.method == "POST":
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            title = request.POST['title']
+            subject = request.POST['subject']
+            mydictionary = {
+                "form" : FeedbackForm()
+            }
+            if title != title.upper():
+                mydictionary["error"] = True
+                mydictionary["errormsg"] = "Title should be Capital"
+            else:
+                mydictionary["success"] = True
+                mydictionary["successmsg"] = "Form Submitted"
+                return render(request, 'myform2.html', context=mydictionary)
+
+    elif request.method == "GET":
+        form = FeedbackForm()
+        mydictionary = {
+            "form" : form
+        }
+        return render(request, 'myform2.html', context=mydictionary)
